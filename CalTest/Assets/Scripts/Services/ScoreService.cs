@@ -1,7 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
 //Manages the scoring logic of the game, including combo calculations
 public class ScoreService : IScoreService
 {
@@ -21,6 +17,7 @@ public class ScoreService : IScoreService
         ComboMultiplier = 1;
     }
 
+    //Resets the entire score, typically will be used when restarting the game
     public void ResetScore()
     {
         Score = 0;
