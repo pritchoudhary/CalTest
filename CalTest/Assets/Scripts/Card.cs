@@ -1,58 +1,75 @@
 using UnityEngine;
-using System.Collections;
 using System;
+using System.Collections;
 
 // Represents a card in the game, managing its state, flip animation, and match behavior.
-// Implements the ICard and IMatchable interfaces to define modular card behavior.
 public class Card : MonoBehaviour, ICard, IMatchable
 {
     public event Action<Card> OnFlipped; // Event triggered when the card is flipped
-    public event Action<Card, Card> OnMatched; // Event triggered when a match is found
-
     public string CardID { get; set; } // Unique identifier used to determine matches
-    public bool IsMatched { get; set; } // Tracks if this card has already been matched
+    public bool IsMatched { get; set; } = false; // Tracks if this card has already been matched
 
     private bool isFaceUp = false; // Indicates if the card is face-up
-    public bool IsFaceUp => isFaceUp;
+    public bool IsFaceUp => isFaceUp; // Public getter to check if the card is face-up
 
-    // Flips the card, changing its orientation and raising the OnFlipped event
+    // Flips the card to face up, triggering the flip animation and invoking the OnFlipped event.
     public void Flip()
     {
-        StartCoroutine(FlipAnimationCoroutine()); // Starts flip animation
-        OnFlipped?.Invoke(this); // Triggers flip event
+        // Prevent flipping if the card is already matched or currently face-up
+        if (IsMatched || isFaceUp) return;
+
+        StartCoroutine(FlipAnimationCoroutine(true)); // Flip to face-up
+        OnFlipped?.Invoke(this); // Trigger the OnFlipped event
     }
 
-    // Coroutine for flip animation, rotating the card 180 degrees on the Y-axis
-    private IEnumerator FlipAnimationCoroutine()
+    // Flips the card back to the original (back-facing) state if it is currently face-up.
+    public void FlipBack()
     {
-        float startRotation = transform.eulerAngles.y;
-        float endRotation = startRotation + 180f;
-
-        // Smoothly rotates the card over 0.5 seconds
-        for (float t = 0; t < 1; t += Time.deltaTime / 0.5f)
+        if (isFaceUp)
         {
-            float yRotation = Mathf.Lerp(startRotation, endRotation, t);
-            transform.eulerAngles = new Vector3(0, yRotation, 0);
-            yield return null;
+            Debug.Log($"Flipping back card: {CardID}"); // Debug message
+            StartCoroutine(FlipAnimationCoroutine(false)); // Trigger the flip animation back to face-down
         }
-
-        transform.eulerAngles = new Vector3(0, endRotation % 360, 0);
-        isFaceUp = !isFaceUp; // Toggles face-up status
     }
 
-    // Checks if the card matches another card based on CardID
+    // Implements the IsMatch method to check if two cards have the same CardID
     public bool IsMatch(ICard otherCard)
     {
-        bool match = CardID == otherCard.CardID;
-        if (match) OnMatched?.Invoke(this, (Card)otherCard); // Triggers match event if match is found
-        return match;
+        return otherCard != null && CardID == otherCard.CardID; // Check for matching CardID
     }
 
-    // Resets the card to back-facing and unmatched state
+    // Resets the card to the initial back-facing state
     public void Reset()
     {
         IsMatched = false;
         isFaceUp = false;
-        transform.eulerAngles = Vector3.zero; // Sets back-facing rotation
+        transform.localEulerAngles = new Vector3(0, 180, 0); // Set to back-facing rotation
+    }
+
+    // Coroutine to animate the flip action of the card, toggling between face-up and face-down.
+    private IEnumerator FlipAnimationCoroutine(bool faceUp)
+    {
+        float startRotation = transform.localEulerAngles.y;
+        float endRotation = faceUp ? 0f : 180f;
+        float duration = 0.3f;
+        float elapsedTime = 0f;
+
+        // Smoothly rotate the card to the target rotation
+        while (elapsedTime < duration)
+        {
+            elapsedTime += Time.deltaTime;
+            float yRotation = Mathf.Lerp(startRotation, endRotation, elapsedTime / duration);
+            transform.localEulerAngles = new Vector3(0, yRotation, 0);
+            yield return null;
+        }
+
+        // Explicitly set the final rotation to ensure precision
+        transform.localEulerAngles = new Vector3(0, endRotation, 0);
+        isFaceUp = faceUp; // Update face-up status
+    }
+
+    private void OnMouseDown()
+    {
+        Flip(); // Trigger the flip action on click
     }
 }
