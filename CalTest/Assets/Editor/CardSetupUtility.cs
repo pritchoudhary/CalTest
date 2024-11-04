@@ -24,7 +24,7 @@ public class CardSetupUtility : Editor
 
                 // Set the initial rotation to (0, 0, 0) to ensure it faces backward
                 Transform cardTransform = cardInstance.GetComponent<Transform>();
-                cardTransform.localRotation = Quaternion.Euler(0, 0, 0);
+                cardTransform.localRotation = Quaternion.Euler(0, 180, 0);
                 cardTransform.localScale = Vector3.one;
 
                 // Add the Card script if it's not already attached
