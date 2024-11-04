@@ -2,6 +2,7 @@ using UnityEngine;
 using TMPro;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 // Manages the main game logic, including card instantiation, matching, sound, and scoring.
 public class GameManager : MonoBehaviour
@@ -65,5 +66,11 @@ public class GameManager : MonoBehaviour
     private void UpdateScoreUI()
     {
         scoreText.text = $"Score: {scoreService.Score}";
+    }
+
+    //Button Click functionality to return to the MainMenu
+    public void BackToMenu()
+    {
+        SceneManager.LoadScene("MainMenu");
     }
 }

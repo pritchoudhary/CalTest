@@ -18,11 +18,17 @@ public class MainMenuManager : MonoBehaviour
         volumeSlider.onValueChanged.AddListener(OnVolumeChanged);
         muteToggle.onValueChanged.AddListener(OnMuteToggled);
     }
-
-    // Starts the gameplay by loading the Gameplay scene
-    public void StartGame()
+    // Loads the level by its build index as specified in the Build Settings
+    public void LoadLevelByIndex(int levelIndex)
     {
-        SceneManager.LoadScene("Gameplay");
+        if (levelIndex >= 0 && levelIndex < SceneManager.sceneCountInBuildSettings)
+        {
+            SceneManager.LoadScene(levelIndex);
+        }
+        else
+        {
+            Debug.LogError("Invalid level index. Make sure the level is added to Build Settings.");
+        }
     }
 
     // Quits the application (only works in a built application)
