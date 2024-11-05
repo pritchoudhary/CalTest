@@ -68,8 +68,50 @@ public class Card : MonoBehaviour, ICard, IMatchable
         isFaceUp = faceUp; // Update face-up status
     }
 
-    private void OnMouseDown()
+    private void Update()
     {
-        Flip(); // Trigger the flip action on click
+        // Handle input for both desktop and mobile
+        HandleInput();
+    }
+
+    private void HandleInput()
+    {
+        if (Input.GetMouseButtonDown(0)) // For desktop mouse click
+        {
+            HandleMouseClick();
+        }
+
+        if (Input.touchCount > 0) // For mobile touch input
+        {
+            Touch touch = Input.GetTouch(0);
+            if (touch.phase == TouchPhase.Began)
+            {
+                HandleTouch(touch.position);
+            }
+        }
+    }
+
+    private void HandleMouseClick()
+    {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        if (Physics.Raycast(ray, out RaycastHit hit))
+        {
+            if (hit.transform == transform) // Check if the card was clicked
+            {
+                Flip(); // Trigger the flip action
+            }
+        }
+    }
+
+    private void HandleTouch(Vector2 touchPosition)
+    {
+        Ray ray = Camera.main.ScreenPointToRay(touchPosition);
+        if (Physics.Raycast(ray, out RaycastHit hit))
+        {
+            if (hit.transform == transform) // Check if the card was touched
+            {
+                Flip(); // Trigger the flip action
+            }
+        }
     }
 }
