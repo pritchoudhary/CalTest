@@ -73,4 +73,23 @@ public class CardManager : MonoBehaviour
             (list[randomIndex], list[i]) = (list[i], list[randomIndex]);
         }
     }
+
+    // Returns all instantiated cards
+    public List<Card> GetAllCards()
+    {
+        List<Card> allCards = new();
+        foreach (Transform cardTransform in cardContainer)
+        {
+            if (cardTransform.TryGetComponent<Card>(out var card))
+            {
+                allCards.Add(card);
+            }
+        }
+        return allCards;
+    }
+
+    public void DeactivateCardContainer()
+    {
+        cardContainer.gameObject.SetActive(false); // Deactivate the container holding the cards
+    }
 }
